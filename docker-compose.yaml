@@ -1,0 +1,23 @@
+version: '3.3'
+
+services:
+  db_host:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=db_user
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=app_db
+    command: ['postgres', '-c', 'log_statement=all']
+
+  redis:
+    image: redis:latest
+
+  app:
+    build: .
+    environment:
+      - DATABASE_URL=postgres://db_user:secret@db_host/app_db
+    ports:
+      - 4000:4000
+    volumes:
+      - ./:/app
+# docker-compose exec app diesel migration run/revert

@@ -1,0 +1,7 @@
+-- Your SQL goes here
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR NOT NULL,
+  username VARCHAR NOT NULL UNIQUE,
+  created_at TIMESTAMP DEFAULT NOW() NOT NULL
+);
