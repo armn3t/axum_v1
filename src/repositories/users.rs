@@ -7,25 +7,21 @@ use bb8::{Pool, PooledConnection};
 
 use crate::models::user::{NewUser, User};
 
-use crate::schema::users;
+use crate::schema;
 
 pub struct UsersRepository;
 
 impl UsersRepository {
-    pub async fn find(
-        // conn: &mut PooledConnection<
-        //     '_,
-        //     AsyncDieselConnectionManager<diesel_async::AsyncPgConnection>,
-        // >,
-        conn: &mut AsyncPgConnection,
-        id: i32,
-    ) -> anyhow::Result<()> {
-        let user = users::table.find(id).load(conn).await?;
-        // let user = diesel::
+    pub async fn find_multiple(
+        conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
+    ) -> QueryResult<Vec<User>> {
+        let users = schema::users::table.limit(100).load(conn).await?;
+        Ok(users)
+    }
 
-        // let user = users[0];
-        // user
-        Ok(user[0])
+    pub async fn find(conn: &mut AsyncPgConnection, id: i32) -> QueryResult<User> {
+        let user = schema::users::table.find(id).get_result(conn).await?;
+        Ok(user)
     }
 
     // pub fn find_multiple(c: &mut AsyncPgConnection, limit: i64) -> QueryResult<Vec<User>> {

@@ -1,5 +1,6 @@
 mod models;
 mod repositories;
+mod routes;
 mod schema;
 
 // use diesel::PgConnection;
@@ -8,42 +9,44 @@ use axum::{
     async_trait,
     extract::{FromRef, FromRequestParts, State},
     http::{request::Parts, StatusCode},
-    response::Json,
     routing::{get, post},
     Router,
 };
 
-// use deadpool_diesel::postgres::{Manager, Pool, Runtime};
-use bb8::PooledConnection;
-use diesel::prelude::*;
-use diesel_async::{
-    pooled_connection::AsyncDieselConnectionManager, AsyncPgConnection, RunQueryDsl,
-};
+use diesel_async::{pooled_connection::AsyncDieselConnectionManager, AsyncPgConnection};
 
 use std::net::SocketAddr;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use std::sync::Arc;
 
 use crate::repositories::users;
 
+pub struct AppState {
+    pool: bb8::Pool<AsyncDieselConnectionManager<AsyncPgConnection>>,
+}
+
+pub type AppStateType = State<Arc<AppState>>;
+
 #[tokio::main]
 async fn main() {
-    // let manager = Manager::new(":memory:", Runtime::Tokio1);
-    // let pool = Pool::builder(manager)
-    //     .max_size(8)
-    //     .build()
-    //     .unwrap();
-    let db_url = std::env::var("DATABASE_URL").unwrap();
+    // let db_url = std::env::var("DATABASE_URL").unwrap();
+    let db_url = "postgres://db_user:secret@db_host:5432/app_db";
     let config = AsyncDieselConnectionManager::<diesel_async::AsyncPgConnection>::new(db_url);
     let pool = bb8::Pool::builder().build(config).await.unwrap();
 
-    let conn = pool.get().await.unwrap();
+    let state = Arc::new(AppState { pool });
 
-    let app = Router::new().route("/", get(root)).with_state(pool);
+    let app = Router::new()
+        .route("/", get(root))
+        .route("/users", get(routes::users::all))
+        .with_state(state);
 
-    axum::Server::bind(&"127.0.0.1:5000".parse().unwrap())
+    let addr = SocketAddr::from(([0, 0, 0, 0], 5005));
+
+    axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
-        .unwrap()
+        .unwrap();
+    tracing::debug!("Axum listening on {}", &addr);
 }
 
 async fn root() -> String {
