@@ -9,6 +9,8 @@ use crate::models::user::{NewUser, User};
 
 use crate::schema;
 
+// use crate::PoolConn;
+
 pub struct UsersRepository;
 
 impl UsersRepository {
@@ -19,29 +21,44 @@ impl UsersRepository {
         Ok(users)
     }
 
-    pub async fn find(conn: &mut AsyncPgConnection, id: i32) -> QueryResult<User> {
+    pub async fn find(
+        conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
+        id: i32,
+    ) -> QueryResult<User> {
         let user = schema::users::table.find(id).get_result(conn).await?;
         Ok(user)
     }
 
-    // pub fn find_multiple(c: &mut AsyncPgConnection, limit: i64) -> QueryResult<Vec<User>> {
-    //     users::table.limit(limit).load(c)
-    // }
+    pub async fn create(
+        conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
+        new_user: NewUser,
+    ) -> QueryResult<User> {
+        diesel::insert_into(schema::users::table)
+            .values(new_user)
+            .get_result(conn)
+            .await
+    }
 
-    // pub fn create(c: &mut AsyncPgConnection, new_rustacean: NewUser) -> QueryResult<User> {
-    //     diesel::insert_into(users::table)
-    //         .values(new_rustacean)
-    //         .get_result(c)
-    //         .await
-    // }
+    pub async fn update(
+        conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
+        id: i32,
+        user: User,
+    ) -> QueryResult<User> {
+        diesel::update(schema::users::table.find(id))
+            .set((
+                schema::users::name.eq(user.name),
+                schema::users::username.eq(user.username),
+            ))
+            .get_result(conn)
+            .await
+    }
 
-    // pub fn update(c: &mut AsyncPgConnection, id: i32, user: User) -> QueryResult<User> {
-    //     diesel::update(users::table.find(id))
-    //         .set((users::name.eq(user.name), users::username.eq(user.username)))
-    //         .get_result(c)
-    // }
-
-    // pub fn delete(c: &mut AsyncPgConnection, id: i32) -> QueryResult<usize> {
-    //     diesel::delete(users::table.find(id)).execute(c)
-    // }
+    pub async fn delete(
+        conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
+        id: i32,
+    ) -> QueryResult<usize> {
+        diesel::delete(schema::users::table.find(id))
+            .execute(conn)
+            .await
+    }
 }
