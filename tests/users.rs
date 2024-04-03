@@ -25,6 +25,6 @@ fn test_get_users() {
     assert!(users.as_array().unwrap().contains(&user2));
 
     //Cleanup
-    delete_test_user(&client, user1);
-    delete_test_user(&client, user2);
+    // delete_test_user(&client, user1);
+    // delete_test_user(&client, user2);
 }

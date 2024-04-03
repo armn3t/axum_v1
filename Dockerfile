@@ -12,4 +12,5 @@ RUN useradd dev -u 1000
 
 EXPOSE 5005
 
-CMD ["cargo", "watch", "--why", "--", "echo"]
+CMD ["cargo", "watch", "-x", "run"]
+# CMD ["cargo", "run"]

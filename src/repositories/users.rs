@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use diesel::{result::Error, QueryResult};
+use diesel::QueryResult;
 use diesel_async::pooled_connection::AsyncDieselConnectionManager;
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 

@@ -1,4 +1,5 @@
 pub mod users;
+pub mod common;
 
 use std::sync::Arc;
 
@@ -17,5 +18,10 @@ pub fn get_user_router() -> Router<Arc<AppState>> {
         .route("/", post(users::create))
         .route("/:user_id", get(users::one))
         .route("/:user_id", delete(users::delete))
-    // .with_state(state)
+}
+
+pub fn get_common_router() -> Router<Arc<AppState>> {
+    Router::new()
+        .route("/", get(common::root))
+        .route("/healthcheck", get(common::healthcheck))
 }
