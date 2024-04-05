@@ -2,12 +2,12 @@ mod middlewares;
 mod models;
 mod repositories;
 mod routes;
+mod lib;
 mod schema;
 
-use axum::{extract::State, middleware, routing::get, Extension, Router};
+use axum::{extract::State, middleware, Router};
 
 use bb8::PooledConnection;
-use diesel::IntoSql;
 use diesel_async::{pooled_connection::AsyncDieselConnectionManager, AsyncPgConnection, RunQueryDsl};
 
 use tokio::signal;
@@ -19,9 +19,10 @@ use crate::{
         auth::get_token,
         request::{measure_req, set_req_id},
     },
-    routes::{get_user_router, get_common_router},
+    routes::{get_auth_router, get_common_router, get_user_router, get_authenticated_router},
 };
 
+// #[derive(Clone)]
 pub struct AppState {
     pool: bb8::Pool<AsyncDieselConnectionManager<AsyncPgConnection>>,
 }
@@ -56,7 +57,6 @@ async fn main() {
 
     tracing::info!("Attempting to retrieve database URL");
     let db_url = std::env::var("DATABASE_URL").unwrap();
-    // let db_url = "postgres://db_user:secret@db_host:5432/app_db";
     tracing::info!("Successfully retrieved database URL");
     
     let config = AsyncDieselConnectionManager::<diesel_async::AsyncPgConnection>::new(db_url);
@@ -75,6 +75,8 @@ async fn main() {
 
     let app = Router::new()
         .nest("/", get_common_router())
+        .nest("/", get_auth_router())
+        .nest("/", get_authenticated_router(state.clone()))
         .nest("/users", get_user_router())
         .layer(middleware::from_fn(measure_req))
         .layer(middleware::from_fn(get_token))

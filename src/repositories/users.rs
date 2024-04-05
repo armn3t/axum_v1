@@ -2,14 +2,15 @@ use diesel::prelude::*;
 use diesel::QueryResult;
 use diesel_async::pooled_connection::AsyncDieselConnectionManager;
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
+use uuid::Uuid;
 
-use bb8::{Pool, PooledConnection};
+use bb8::PooledConnection;
 
-use crate::models::user::{NewUser, User};
+use crate::lib::auth;
+use crate::models::user::{NewUserFields, UpdatableFieldsUser};
+use crate::models::user::{NewUserInput, User};
 
-use crate::schema;
-
-// use crate::PoolConn;
+use crate::schema::users;
 
 pub struct UsersRepository;
 
@@ -17,7 +18,7 @@ impl UsersRepository {
     pub async fn find_multiple(
         conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
     ) -> QueryResult<Vec<User>> {
-        let users = schema::users::table.limit(100).load(conn).await?;
+        let users = users::table.limit(100).load(conn).await?;
         Ok(users)
     }
 
@@ -25,16 +26,39 @@ impl UsersRepository {
         conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
         id: i32,
     ) -> QueryResult<User> {
-        let user = schema::users::table.find(id).get_result(conn).await?;
+        let user = users::table.find(id).get_result(conn).await?;
         Ok(user)
+    }
+    
+    pub async fn find_by_username(
+        conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
+        username: &str,
+    ) -> Option<User> {
+        match diesel::QueryDsl::filter(users::dsl::users, users::username.eq(username))
+            .first::<User>(conn).await {
+                Ok(user) => {
+                    Some(user)
+                },
+                Err(err) => {
+                    println!("No such user: {}", username);
+                    None
+                }
+            }
     }
 
     pub async fn create(
         conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
-        new_user: NewUser,
+        new_user: NewUserInput,
     ) -> QueryResult<User> {
-        diesel::insert_into(schema::users::table)
-            .values(new_user)
+        let NewUserInput { name, username, password } = new_user;
+        let new_user_fields = NewUserFields {
+            name,
+            username,
+            password: auth::hash_password(&password),
+            api_token: Uuid::new_v4().to_string(),
+        };
+        diesel::insert_into(users::table)
+            .values(new_user_fields)
             .get_result(conn)
             .await
     }
@@ -42,13 +66,11 @@ impl UsersRepository {
     pub async fn update(
         conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
         id: i32,
-        user: User,
+        user: UpdatableFieldsUser,
     ) -> QueryResult<User> {
-        diesel::update(schema::users::table.find(id))
-            .set((
-                schema::users::name.eq(user.name),
-                schema::users::username.eq(user.username),
-            ))
+        // user.password = Some(format!("hash_pretend_{}", user.password));
+        diesel::update(users::table.find(id))
+            .set(user)
             .get_result(conn)
             .await
     }
@@ -57,7 +79,7 @@ impl UsersRepository {
         conn: &mut PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>>,
         id: i32,
     ) -> QueryResult<usize> {
-        diesel::delete(schema::users::table.find(id))
+        diesel::delete(users::table.find(id))
             .execute(conn)
             .await
     }

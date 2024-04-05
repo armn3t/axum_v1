@@ -3,11 +3,11 @@ use axum::{
     http::StatusCode,
     response::Json,
 };
-use diesel_async::AsyncPgConnection;
+// use diesel_async::AsyncPgConnection;
 use serde_json::{json, Value};
 
 use crate::{
-    models::user::{NewUser, User},
+    models::user::{NewUserInput, User, UpdatableFieldsUser},
     repositories::users::UsersRepository,
 };
 
@@ -35,7 +35,7 @@ pub async fn one(State(state): AppStateType) -> Json<Value> {
 
 pub async fn create(
     State(state): AppStateType,
-    Json(payload): Json<NewUser>,
+    Json(payload): Json<NewUserInput>,
 ) -> (StatusCode, Json<Value>) {
     println!("Create user: {}", payload.username);
 
@@ -44,6 +44,18 @@ pub async fn create(
     let user = UsersRepository::create(&mut conn, payload).await.unwrap();
 
     (StatusCode::CREATED, Json(json!(user)))
+}
+
+pub async fn update(
+    Path(user_id): Path<i32>,
+    State(state): AppStateType,
+    Json(payload): Json<UpdatableFieldsUser>,
+) -> (StatusCode, Json<Value>) {
+    println!("UPDATE USER: {}", user_id);
+    let mut conn = get_conn(&state.pool).await;
+
+    let updated_user = UsersRepository::update(&mut conn, user_id, payload).await.unwrap();
+    (StatusCode::OK, Json(json!(updated_user)))
 }
 
 pub async fn delete(Path(user_id): Path<i32>, State(state): AppStateType) -> StatusCode {

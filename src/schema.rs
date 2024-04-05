@@ -5,6 +5,9 @@ diesel::table! {
         id -> Int4,
         name -> Varchar,
         username -> Varchar,
+        password -> Varchar,
+        api_token -> Varchar,
         created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }

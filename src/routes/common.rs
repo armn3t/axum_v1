@@ -1,10 +1,9 @@
 use axum::{
-    extract::{Path, State},
+    extract::State,
     http::StatusCode,
     response::Json,
 };
 
-use diesel_async::AsyncPgConnection;
 use serde_json::{json, Value};
 
 use crate::{get_conn, test_conn, AppStateType};

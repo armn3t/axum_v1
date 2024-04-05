@@ -1,4 +1,5 @@
 use axum::body::Body;
+use axum::RequestExt;
 use uuid::Uuid;
 
 use axum::{http::Request, middleware::Next, response::Response};
@@ -6,6 +7,7 @@ use axum::{http::Request, middleware::Next, response::Response};
 use std::fmt::{Display, Formatter, Result};
 use std::time::Instant;
 
+#[derive(Clone)]
 pub struct RequestId {
     id: String,
 }
@@ -38,10 +40,11 @@ impl Display for RequestId {
 }
 
 pub async fn set_req_id(mut req: Request<Body>, next: Next) -> Response {
-    // let req_id = RequestId::new();
-    let req_id = Uuid::new_v4().to_string();
+    let req_id = RequestId::new();
+    // let req_id = Uuid::new_v4().to_string();
     let start = ReqMetrics::new();
     println!("FIRST MW. req_id: {}", req_id);
+    println!("FIRST MW. path: {}", req.uri());
     req.extensions_mut().insert(req_id);
     req.extensions_mut().insert(start);
     next.run(req).await

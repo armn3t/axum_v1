@@ -1,0 +1,66 @@
+
+POST http://localhost:5005/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "asd",
+    "password": "secret"
+}
+
+###
+
+POST http://localhost:5005/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "asd",
+    "password": "incorrect"
+}
+
+###
+
+POST http://localhost:5005/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "foo",
+    "password": "secret"
+}
+
+###
+
+POST http://localhost:5005/authenticated HTTP/1.1
+content-type: application/json
+
+{}
+
+###
+
+POST http://localhost:5005/authenticated HTTP/1.1
+content-type: application/json
+Authorization: Bearer asd
+
+{}
+
+###
+
+POST http://localhost:5005/authenticated HTTP/1.1
+content-type: application/json
+# Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTIzNTYxNDgsImlhdCI6MTcxMjM1MjU0OCwic3ViIjoie1wiaWRcIjo3Nn0ifQ.N7hzoXJAA6czAshTZRnCQVAsJ0GLNc05A32b6oOyCIs
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTIzNjA1MTAsImlhdCI6MTcxMjM1NjkxMCwic3ViIjoie1wiaWRcIjoxNDh9In0.bXUdYKi6LyjQ5jGpbQS2IbhemZSEj50yROeahSd-M3M
+
+{}
+
+###
+
+POST http://localhost:5005/register HTTP/1.1
+content-type: application/json
+
+{
+    "name": "asddd",
+    "username": "asddd",
+    "password": "secret"
+}
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTIzNjAwNDUsImlhdCI6MTcxMjM1NjQ0NSwic3ViIjoie1wiaWRcIjoxNDd9In0.RtGFZ1vVzdaNik8CaI1lYXlzg8y6fTjclBS-472fPkQ
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTIzNjAwNDUsImlhdCI6MTcxMjM1NjQ0NSwic3ViIjoie1wiaWRcIjoxNDd9In0.RtGFZ1vVzdaNik8CaI1lYXlzg8y6fTjclBS-472fPkQ
