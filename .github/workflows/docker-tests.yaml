@@ -18,8 +18,10 @@ jobs:
           profile: minimal
           toolchain: stable
           components: rustfmt, clippy
+      - name: Run Cargo Check
+        run: cargo check
       - uses: adambirds/docker-compose-action@v1.3.0
         with:
           compose-file: ./docker-compose.yaml
-          test-command: "cargo check && cargo test"
-
+      - name: Run Tests
+        run: cargo test
