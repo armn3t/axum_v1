@@ -13,8 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
       - uses: adambirds/docker-compose-action@v1.3.0
         with:
           compose-file: ./docker-compose.yaml
-          test-command: "docker compose exec app cargo test"
+          test-command: "cargo check && cargo test"
 
