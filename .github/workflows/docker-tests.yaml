@@ -3,6 +3,8 @@ run-name: ${{ github.actor }} is running integration tests for axum-srv 🚀
 
 on:
   push:
+    branches:
+      - master
   pull_request:
 
 jobs:
