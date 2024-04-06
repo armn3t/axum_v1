@@ -6,9 +6,9 @@ use axum::{
     extract::State,
 };
 
-use serde_json::{json, Value};
+use serde_json::json;
 
-use crate::{get_conn, lib::{auth::{self, authn_token}, jwt::{get_jwt_token, AUTHORIZATION}}, AppStateType};
+use crate::{get_conn, libs::{auth::authn_token, jwt::{get_jwt_token, AUTHORIZATION}}, AppStateType};
 
 pub async fn get_token(mut req: Request<Body>, next: Next) -> Response {
     println!("GET TOKEN MIDDLEWARE {:?}", req.headers());

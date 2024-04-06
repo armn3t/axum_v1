@@ -5,13 +5,12 @@ pub mod auth;
 use std::sync::Arc;
 
 use axum::{
-    extract::State,
-    middleware::{self, FromExtractor},
+    middleware::{self},
     routing::{any, delete, get, patch, post},
     Router,
 };
 
-use crate::{middlewares::auth::is_authenticated, AppState, AppStateType};
+use crate::{middlewares::auth::is_authenticated, AppState};
 
 pub fn get_user_router() -> Router<Arc<AppState>> {
     Router::new()

@@ -1,5 +1,5 @@
 
-use anyhow::{Result, bail};
+use anyhow::Result;
 use bb8::PooledConnection;
 use diesel_async::{pooled_connection::AsyncDieselConnectionManager, AsyncPgConnection};
 

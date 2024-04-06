@@ -1,5 +1,3 @@
-use std::mem;
-
 use reqwest::{blocking::Client, StatusCode};
 use serde_json::{json, Value};
 

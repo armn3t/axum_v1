@@ -8,11 +8,11 @@ use serde_json::{json, Value};
 
 use crate::{
     get_conn,
-    lib::jwt::create_jwt_header, models::user::{NewUserInput, User},
+    libs::jwt::create_jwt_header, models::user::{NewUserInput, User},
     repositories::users::UsersRepository,
     AppStateType
 };
-use crate::lib::{auth, jwt::{TokenUserData, create_jwt_token, AUTHORIZATION}};
+use crate::libs::{auth, jwt::{TokenUserData, create_jwt_token, AUTHORIZATION}};
 
 
 #[derive(Deserialize, Debug)]

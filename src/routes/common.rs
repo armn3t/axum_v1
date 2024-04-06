@@ -1,12 +1,11 @@
 use axum::{
     extract::State,
-    http::StatusCode,
     response::Json,
 };
 
 use serde_json::{json, Value};
 
-use crate::{get_conn, test_conn, AppStateType};
+use crate::{test_conn, AppStateType};
 
 pub async fn healthcheck(State(state): AppStateType) -> Json<Value> {
     test_conn(&state.pool).await;

@@ -1,5 +1,4 @@
 use axum::body::Body;
-use axum::RequestExt;
 use uuid::Uuid;
 
 use axum::{http::Request, middleware::Next, response::Response};
