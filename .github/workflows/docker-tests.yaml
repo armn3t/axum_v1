@@ -27,6 +27,8 @@ jobs:
       - name: Start App with docker-compose
         run: docker compose up -d
 
+      - name: Run db migrations
+        run: docker compose exec app diesel migration run
       # - name: Run Tests
       #   run: cargo test
 
