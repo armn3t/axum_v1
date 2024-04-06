@@ -1,14 +1,12 @@
 version: '3.3'
 
 services:
-  db_host:
-    image: postgres:latest
+  app:
+    build: .
     environment:
-      - POSTGRES_USER=db_user
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=app_db
-    command: ['postgres', '-c', 'log_statement=all']
+      - DATABASE_URL=postgres://db_user:secret@db_host:5432/app_db
     ports:
-      - '5432:5432'
-  redis:
-    image: redis:latest
+      - 5005:5005
+    volumes:
+      - ./:/app
+    command: cargo watch -x run

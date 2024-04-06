@@ -14,5 +14,5 @@ EXPOSE 5005
 
 ENV DOCKER_TARGET_DIR /target
 
-CMD ["cargo", "watch", "-x", "run"]
-# CMD ["cargo", "run"]
+# CMD ["cargo", "watch", "-x", "run"]
+CMD ["cargo", "run"]
