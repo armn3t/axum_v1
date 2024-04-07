@@ -2,13 +2,19 @@
 # Stacks detected: cicd:github-actions:.github/workflows,deps:rust:.
 version: 2.1
 jobs:
+
   test-rust:
     docker:
       - image: cimg/rust:1.73
     steps:
+      - setup_remote_docker
       - checkout
       - restore_cache:
           key: cargo-{{ checksum "Cargo.lock" }}
+      - run:
+          command: docker version
+      - run:
+          command: docker compose version
       - run:
           command: cargo test
       - save_cache:
