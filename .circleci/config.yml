@@ -7,12 +7,12 @@ jobs:
     docker:
       - image: cimg/rust:1.73
     steps:
-      # - setup_remote_docker
       - checkout
       - restore_cache:
           key: cargo-{{ checksum "Cargo.lock" }}
       - run:
           command: cargo check
+      - setup_remote_docker
       - run:
           command: docker version
       - run:
