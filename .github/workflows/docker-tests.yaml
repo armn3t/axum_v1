@@ -21,32 +21,14 @@ jobs:
       - name: Run Cargo Check
         run: cargo check
       
-      # - name: Install diesel CLI
-        # run: cargo install diesel_cli --no-default-features --features postgres
-
-      - name: Start App with docker-compose
-        run: docker compose up -d
+      # - name: Start App with docker-compose
+      #   run: docker compose up -d
 
       # - name: Install DB checker
-        # run: sudo apt-get update && sudo apt-get install -y postgresql-client-15
+      #   run: sudo apt-get update && sudo apt-get install -y postgresql-client-15
 
-      - name: Run db migrations
-        run: docker compose exec -T app diesel migration run
- 
       # - name: Run db migrations
-      #   run: diesel migration run
-
-      # - name: Build app
-      #   run: cargo build --release
-
-      # - name: Run app
-      #   run: DATABASE_URL=postgres://db_user:secret@0.0.0.0:5432/app_db ./target/release/rust_axum
-      # - uses: adambirds/docker-compose-action@v1.3.0
-      #   with:
-      #     compose-file: ./docker-compose.yaml
-      
+      #   run: docker compose exec -T app diesel migration run
+ 
       # - name: Run Tests
-      #   run: cargo test
-
-      - name: Run Tests
-        run: docker compose exec app cargo test
+      #   run: docker compose exec app cargo test

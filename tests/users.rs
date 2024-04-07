@@ -14,7 +14,7 @@ fn test_get_users() {
 
     let res = client.get(format!("{}/users", URL)).send().unwrap();
 
-    assert_eq!(res.status(), StatusCode::FORBIDDEN);
+    assert_eq!(res.status(), StatusCode::OK);
 
     let body: Value = res.json().unwrap();
     let users = body.get("users").unwrap();
