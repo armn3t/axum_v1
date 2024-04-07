@@ -18,7 +18,7 @@ jobs:
       - run:
           command: docker compose version
       - run:
-          command: docker compose up 
+          command: docker compose up -d
       - run:
           command: curl localhost:5005/healthcheck
       - run:
