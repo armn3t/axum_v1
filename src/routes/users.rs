@@ -3,11 +3,10 @@ use axum::{
     http::StatusCode,
     response::Json,
 };
-// use diesel_async::AsyncPgConnection;
 use serde_json::{json, Value};
 
 use crate::{
-    models::user::{NewUserInput, User, UpdatableFieldsUser},
+    models::user::{NewUserInput, UpdatableFieldsUser},
     repositories::users::UsersRepository,
 };
 

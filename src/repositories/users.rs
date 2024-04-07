@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use bb8::PooledConnection;
 
-use crate::lib::auth;
+use crate::libs::auth;
 use crate::models::user::{NewUserFields, UpdatableFieldsUser};
 use crate::models::user::{NewUserInput, User};
 
@@ -40,7 +40,7 @@ impl UsersRepository {
                     Some(user)
                 },
                 Err(err) => {
-                    println!("No such user: {}", username);
+                    println!("No such user: {} - {}", username, err);
                     None
                 }
             }

@@ -2,7 +2,7 @@ mod middlewares;
 mod models;
 mod repositories;
 mod routes;
-mod lib;
+mod libs;
 mod schema;
 
 use axum::{extract::State, middleware, Router};
