@@ -19,8 +19,11 @@ jobs:
           command: docker compose version
       - run:
           command: docker compose up -d
-      # - run:
-      #     command: curl 0.0.0.0:5005/healthcheck
+      - run:
+          command: docker compose exec app curl 127.0.0.1:5005/healthcheck
+      - run:
+          name: Waiting for DB to be ready
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           command: docker compose exec app diesel migration run
       - run:
