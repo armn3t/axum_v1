@@ -18,11 +18,11 @@ jobs:
       - run:
           command: docker compose version
       - run:
-          command: docker compose up -d
-      - run:
-          command: docker compose exec app diesel migration run
-      - run:
-          command: docker compose exec app cargo test
+          command: docker compose up -d && docker compose exec app diesel migration run && docker compose exec app cargo test
+      # - run:
+      #     command: docker compose exec app diesel migration run
+      # - run:
+      #     command: docker compose exec app cargo test
       - save_cache:
           key: cargo-{{ checksum "Cargo.lock" }}
           paths:
