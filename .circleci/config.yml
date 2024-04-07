@@ -12,6 +12,8 @@ jobs:
       - restore_cache:
           key: cargo-{{ checksum "Cargo.lock" }}
       - run:
+          command: cargo check
+      - run:
           command: docker version
       - run:
           command: docker compose version
