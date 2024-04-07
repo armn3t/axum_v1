@@ -2,7 +2,7 @@
 
 services:
   db_host:
-    image: postgres:latest
+    image: postgres:16
     environment:
       - POSTGRES_USER=db_user
       - POSTGRES_PASSWORD=secret
@@ -10,6 +10,11 @@ services:
     command: ['postgres', '-c', 'log_statement=all']
     ports:
       - '5432:5432'
+    healthcheck:
+      test: pg_isready -h 0.0.0.0 -U $POSTGRES_USER --dbname app_db
+      interval: 5s
+      timeout: 5s
+      retries: 15
   # redis:
     # image: redis:latest
 
