@@ -1,0 +1,36 @@
+name: Test build with dev db
+run-name: ${{ github.actor }} is running integration tests for axum-srv 🚀
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  Docker-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+      - name: Run Cargo Check
+        run: cargo check
+
+      - name: Run Cargo Release Build
+        run: cargo build --release
+
+      - name: List release
+        run: ls -l ./target/release
+
+      - name: Run and Test Release App
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          ./target/release/rust_axum &
+          for attempt in {1..20}; do sleep 1; if curl localhost:5005/healthcheck; then echo ready; break; fi; echo waiting...; done 
+          cargo test
