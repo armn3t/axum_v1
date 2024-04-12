@@ -10,6 +10,24 @@ on:
 jobs:
   Docker-Tests:
     runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        env:
+          POSTGRES_USER: db_user
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: app_db
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
     steps:
       - uses: actions/checkout@v4
 
@@ -27,10 +45,18 @@ jobs:
       - name: List release
         run: ls -l ./target/release
 
+      - name: Install Diesel-CLI
+        run: cargo install diesel_cli --no-default-features --features postgres
+
+      - name: Run DB migrations
+        env:
+          DATABASE_URL: postgres://db_user:secret@127.0.0.1/app_db
+        run: diesel migration run                
+
       - name: Run and Test Release App
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: postgres://db_user:secret@127.0.0.1/app_db
         run: |
           ./target/release/rust_axum &
-          for attempt in {1..20}; do sleep 1; if curl localhost:5005/healthcheck; then echo ready; break; fi; echo waiting...; done 
+          for attempt in {1..20}; do sleep 1; if curl 127.0.0.1:5005/healthcheck; then echo ready; break; fi; echo waiting...; done 
           cargo test

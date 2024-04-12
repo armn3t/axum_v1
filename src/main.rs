@@ -32,7 +32,7 @@ pub type AppStateType = State<Arc<AppState>>;
 pub async fn get_conn(
     pool: &bb8::Pool<AsyncDieselConnectionManager<AsyncPgConnection>>,
 ) -> PooledConnection<'_, AsyncDieselConnectionManager<AsyncPgConnection>> {
-    let conn = pool.get().await.unwrap();
+    let conn = pool.get().await.expect("Connection created");
     conn
 }
 
@@ -40,10 +40,8 @@ async fn test_conn(
     pool: &bb8::Pool<AsyncDieselConnectionManager<AsyncPgConnection>>,
 ) {
     let mut conn = get_conn(&pool).await;
-
     let result = diesel::sql_query("SELECT 1").execute(&mut conn).await.expect("Healthcheck result");
-
-    println!("Connection result: {}", result);
+    tracing::info!("Connection result: {}", result);
 
 }
 
@@ -56,12 +54,12 @@ async fn main() {
     tracing::info!("Attempting to start axum server");
 
     tracing::info!("Attempting to retrieve database URL");
-    let db_url = std::env::var("DATABASE_URL").unwrap();
+    let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL to be available");
     tracing::info!("Successfully retrieved database URL");
     
     let config = AsyncDieselConnectionManager::<diesel_async::AsyncPgConnection>::new(db_url);
     tracing::info!("Attempting to create database connection pool");
-    let pool = bb8::Pool::builder().build(config).await.unwrap();
+    let pool = bb8::Pool::builder().build(config).await.expect("DB connection pool to be created");
     tracing::info!("Successfully created database connection pool");
 
     let state = Arc::new(AppState {
@@ -83,10 +81,12 @@ async fn main() {
         .layer(middleware::from_fn(set_req_id))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await.expect("Create TCP listener for server");
     tracing::info!("Axum listening on {}", &addr);
     axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal()).await.unwrap();
+        .with_graceful_shutdown(shutdown_signal())
+        .await
+        .expect(&format!("Axum server to start listenning on {}", &addr));
 }
 
 async fn shutdown_signal() {
