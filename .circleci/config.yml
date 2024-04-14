@@ -22,7 +22,7 @@ jobs:
       - run:
           command: |
             docker compose up -d &&
-            for attempt in {1..20}; do sleep 1; if curl 127.0.0.1:5005/healthcheck; then echo ready; break; fi; echo waiting...; done
+            docker compose exec app bin/./healtcheck.sh
       - run:
           command: docker compose exec app diesel migration run
       - run:
