@@ -58,5 +58,5 @@ jobs:
           DATABASE_URL: postgres://db_user:secret@127.0.0.1/app_db
         run: |
           ./target/release/rust_axum &
-          for attempt in {1..20}; do sleep 1; if curl 127.0.0.1:5005/healthcheck; then echo ready; break; fi; echo waiting...; done 
+          bin/./healthcheck.sh
           cargo test
