@@ -3,7 +3,7 @@
 version: 2.1
 jobs:
 
-  test-rust:
+  test-service:
     docker:
       - image: cimg/rust:1.73
     steps:
@@ -34,7 +34,4 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - test-rust
-    # - deploy:
-    #     requires:
-    #       - test-rust
+      - test-service
