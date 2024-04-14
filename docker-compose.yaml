@@ -24,4 +24,6 @@ services:
       - DATABASE_URL=postgres://db_user:secret@db_host:5432/app_db
     ports:
       - 5005:5005
+    depends_on:
+      - db_host
 # docker-compose exec app diesel migration run/revert
