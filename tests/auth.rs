@@ -1,3 +1,4 @@
+use uuid::Uuid;
 use reqwest::{blocking::Client, StatusCode};
 use serde_json::{json, Value};
 
@@ -104,7 +105,6 @@ fn test_authenticated_user() {
 
     let auth_header = headers.get("authorization").unwrap().to_str().unwrap();
 
-    println!("AUTH HEADER: {}", auth_header);
     let auth_res = client.post(get_authenticated_url())
         .header("authorization", auth_header.to_owned())
         .send().unwrap();
@@ -114,10 +114,64 @@ fn test_authenticated_user() {
     delete_test_user(&client, user);
 }
 
+#[test]
+fn test_register_user() {
+    let client = Client::new();
+
+    let res = client.post(get_register_url())
+        .json(&json!({
+            "username": format!("abc_{}", Uuid::new_v4()),
+            "password": "pass",
+            "name": "name",
+        }))
+        .send().unwrap();
+
+    assert_eq!(StatusCode::OK, res.status());
+    
+    let headers = res.headers();
+    let auth_header = headers.get("authorization").unwrap().to_str().unwrap();
+    assert!(auth_header.len() > 0);        
+}
+
+#[test]
+fn test_register_user_invalid_input() {
+    let client = Client::new();
+
+    let res = client.post(get_register_url())
+        .json(&json!({
+            "username": format!("abc_{}", Uuid::new_v4()),
+            "name": "name",
+        }))
+        .send().unwrap();
+
+    assert_eq!(StatusCode::UNPROCESSABLE_ENTITY, res.status());
+}
+
+#[test]
+fn test_register_user_exists() {
+    let client = Client::new();
+
+    let user = create_test_user(&client);
+
+    let res = client.post(get_register_url())
+    .json(&json!({
+        "username": user["username"],
+        "password": "pass",
+        "name": "name",
+    }))
+    .send().unwrap();
+
+    assert_eq!(StatusCode::BAD_REQUEST, res.status());
+}
+
 fn get_authenticated_url() -> String {
     format!("{}/authenticated", URL)
 }
 
 fn get_login_url() -> String {
     format!("{}/login", URL)
+}
+
+fn get_register_url() -> String {
+    format!("{}/register", URL)
 }

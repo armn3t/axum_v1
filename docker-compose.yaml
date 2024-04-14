@@ -1,5 +1,3 @@
-# dversion: '3.3'
-
 services:
   db_host:
     image: postgres:16

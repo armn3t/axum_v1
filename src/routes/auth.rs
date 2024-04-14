@@ -68,5 +68,5 @@ pub async fn register(State(state): AppStateType, Json(payload): Json<NewUserInp
 
     headers.insert(AUTHORIZATION, create_jwt_header(token).parse().unwrap());
 
-    (StatusCode::CREATED, headers, Json(json!(user)))
+    (StatusCode::OK, headers, Json(json!(user)))
 }
