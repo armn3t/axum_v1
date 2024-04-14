@@ -3,7 +3,7 @@
 version: 2.1
 jobs:
 
-  test-rust:
+  test-service:
     docker:
       - image: cimg/rust:1.73
     steps:
@@ -18,12 +18,11 @@ jobs:
       - run:
           command: docker compose version
       - run:
-          command: docker compose up -d
+          command: docker compose build
       - run:
-          command: docker compose exec app curl 127.0.0.1:5005/healthcheck
-      - run:
-          name: Waiting for DB to be ready
-          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+          command: |
+            docker compose up -d &&
+            docker compose exec app bin/./healthcheck.sh
       - run:
           command: docker compose exec app diesel migration run
       - run:
@@ -32,22 +31,7 @@ jobs:
           key: cargo-{{ checksum "Cargo.lock" }}
           paths:
             - ~/.cargo
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
-      - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
-      - run:
-          name: found github actions config
-          command: ':'
 workflows:
   build-and-test:
     jobs:
-      - test-rust
-    # - deploy:
-    #     requires:
-    #       - test-rust
+      - test-service
