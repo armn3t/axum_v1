@@ -5,6 +5,7 @@ mod routes;
 mod libs;
 mod schema;
 
+use axum_otel_metrics::HttpMetricsLayerBuilder;
 use axum::{extract::State, middleware, Router};
 
 use bb8::PooledConnection;
@@ -68,10 +69,13 @@ async fn main() {
     });
 
     test_conn(&state.pool).await;
-    
+
+    let metrics = HttpMetricsLayerBuilder::new().build();
+
     let addr = SocketAddr::from(([0, 0, 0, 0], 5005));
 
     let app = Router::new()
+        .merge(metrics.routes())
         .nest("/", get_common_router())
         .nest("/", get_auth_router())
         .nest("/", get_authenticated_router(state.clone()))
@@ -79,6 +83,7 @@ async fn main() {
         .layer(middleware::from_fn(measure_req))
         .layer(middleware::from_fn(get_token))
         .layer(middleware::from_fn(set_req_id))
+        .layer(metrics)
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(addr).await.expect("Create TCP listener for server");
