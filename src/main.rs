@@ -4,6 +4,7 @@ mod repositories;
 mod routes;
 mod libs;
 mod schema;
+mod config;
 
 use axum_otel_metrics::HttpMetricsLayerBuilder;
 use axum::{extract::State, middleware, Router};
@@ -21,11 +22,13 @@ use crate::{
         request::{measure_req, set_req_id},
     },
     routes::{get_auth_router, get_common_router, get_user_router, get_authenticated_router},
+    config::{load_config, AppConfig}
 };
 
 // #[derive(Clone)]
 pub struct AppState {
     pool: bb8::Pool<AsyncDieselConnectionManager<AsyncPgConnection>>,
+    config: AppConfig,
 }
 
 pub type AppStateType = State<Arc<AppState>>;
@@ -53,18 +56,24 @@ async fn main() {
         .json()
         .init();
     tracing::info!("Attempting to start axum server");
+    tracing::info!("Attempting to load config");
 
-    tracing::info!("Attempting to retrieve database URL");
-    let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL to be available");
-    tracing::info!("Successfully retrieved database URL");
+    let config = load_config();
+    tracing::info!("Config loaded");
     
-    let config = AsyncDieselConnectionManager::<diesel_async::AsyncPgConnection>::new(db_url);
+
+    // tracing::info!("Attempting to retrieve database URL");
+    // let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL to be available");
+    // tracing::info!("Successfully retrieved database URL");
+    
+    let db_config = AsyncDieselConnectionManager::<diesel_async::AsyncPgConnection>::new(&config.database_url);
     tracing::info!("Attempting to create database connection pool");
-    let pool = bb8::Pool::builder().build(config).await.expect("DB connection pool to be created");
+    let pool = bb8::Pool::builder().build(db_config).await.expect("DB connection pool to be created");
     tracing::info!("Successfully created database connection pool");
 
     let state = Arc::new(AppState {
         pool,
+        config
         // ids: AppIdentifiers { requestId: None },
     });
 
