@@ -46,8 +46,7 @@ Authorization: Bearer asd
 
 POST http://localhost:5005/authenticated HTTP/1.1
 content-type: application/json
-# Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTIzNTYxNDgsImlhdCI6MTcxMjM1MjU0OCwic3ViIjoie1wiaWRcIjo3Nn0ifQ.N7hzoXJAA6czAshTZRnCQVAsJ0GLNc05A32b6oOyCIs
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTIzNjA1MTAsImlhdCI6MTcxMjM1NjkxMCwic3ViIjoie1wiaWRcIjoxNDh9In0.bXUdYKi6LyjQ5jGpbQS2IbhemZSEj50yROeahSd-M3M
+Authorization: Bearer abc
 
 {}
 

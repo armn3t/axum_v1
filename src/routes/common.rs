@@ -9,7 +9,6 @@ use crate::{test_conn, AppStateType};
 
 pub async fn healthcheck(State(state): AppStateType) -> Json<Value> {
     test_conn(&state.pool).await;
-    println!("Healtcheck OK");
     Json(json!({"db": "ok"}))
 }
 

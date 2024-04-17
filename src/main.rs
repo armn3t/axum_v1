@@ -42,8 +42,8 @@ async fn test_conn(
 ) {
     let mut conn = get_conn(&pool).await;
     let result = diesel::sql_query("SELECT 1").execute(&mut conn).await.expect("Healthcheck result");
-    tracing::info!("Connection result: {}", result);
 
+    tracing::info!("Connection result: {}", result);
 }
 
 #[tokio::main]

@@ -23,31 +23,28 @@ pub struct AuthUser {
 
 pub async fn login(State(state): AppStateType, Json(payload): Json<AuthUser>) -> (StatusCode, HeaderMap, Json<Value>) {
     let mut conn = get_conn(&state.pool).await;
-    println!("AUTH: {:?}", payload);
     let user_opt: Option<User> = UsersRepository::find_by_username(&mut conn, &payload.username).await;
 
     let mut headers = HeaderMap::new();
     match user_opt {
         Some(user) => {
-            println!("CHECK: {} - {}", user.password, auth::hash_password(&payload.password));
-            if user.password != auth::hash_password(&payload.password) {
+            if !auth::verify_password(&payload.password, &user.password).await {
                 return (StatusCode::UNAUTHORIZED, headers, Json(json!({"message": "unauth"})));
             }
 
             let token = create_jwt_token(TokenUserData { id: user.id });
-
             headers.insert(AUTHORIZATION, create_jwt_header(token).parse().unwrap());
 
             (StatusCode::OK, headers, Json(json!({"user": user})))
         },
         None => {
-            
             (StatusCode::NOT_FOUND, headers, Json(json!({"message": "User not found"})))
         }
     }
 }
 
 pub async fn authenticated(Extension(user): Extension<User>) -> (StatusCode, Json<Value>) {
+    tracing::info!("User {} is authenticated", user.username);
     (StatusCode::OK, Json(json!({"message": "authenticated", "username": user.username})))
 }
 
