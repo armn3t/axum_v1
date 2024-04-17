@@ -21,6 +21,7 @@ anyhow = "1.0.81"
 uuid = { version = "1.8.0", features = ["v4"] }
 jsonwebtoken = "9.3.0"
 axum-otel-metrics = "0.8.1"
+pwhash = "1.0.0"
 
 [dev-dependencies]
 reqwest = { version = "0.12.2", features = ["json", "blocking"] }

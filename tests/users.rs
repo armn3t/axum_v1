@@ -19,8 +19,6 @@ fn test_get_users() {
     let body: Value = res.json().unwrap();
     let users = body.get("users").unwrap();
 
-    println!("USERS IN TEST: {}", users);
-
     assert!(users.as_array().unwrap().len() > 0);
     assert!(users.as_array().unwrap().contains(&user1));
     assert!(users.as_array().unwrap().contains(&user2));

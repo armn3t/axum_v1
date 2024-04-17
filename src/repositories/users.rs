@@ -40,7 +40,7 @@ impl UsersRepository {
                     Some(user)
                 },
                 Err(err) => {
-                    println!("No such user: {} - {}", username, err);
+                    tracing::error!("Error finding user: {}", err);
                     None
                 }
             }
@@ -54,7 +54,7 @@ impl UsersRepository {
         let new_user_fields = NewUserFields {
             name,
             username,
-            password: auth::hash_password(&password),
+            password: auth::hash_password(&password).await,
             api_token: Uuid::new_v4().to_string(),
         };
         diesel::insert_into(users::table)
