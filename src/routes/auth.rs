@@ -43,8 +43,9 @@ pub async fn login(State(state): AppStateType, Json(payload): Json<AuthUser>) ->
     }
 }
 
-pub async fn authenticated(Extension(user): Extension<User>) -> (StatusCode, Json<Value>) {
+pub async fn authenticated(State(state): AppStateType, Extension(user): Extension<User>) -> (StatusCode, Json<Value>) {
     tracing::info!("User {} is authenticated", user.username);
+    tracing::info!("Config {}", state.config.whatever);
     (StatusCode::OK, Json(json!({"message": "authenticated", "username": user.username})))
 }
 
